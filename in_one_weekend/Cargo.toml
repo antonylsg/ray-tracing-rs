@@ -1,0 +1,11 @@
+[package]
+name = "in_one_weekend"
+version = "0.1.0"
+authors = ["Antony Lesage <lesage.antony@gmail.com>"]
+
+[dependencies]
+derive-new = "0.5"
+itertools = "0.7"
+nalgebra = "0.16"
+rand = "0.6"
+rayon = "1.0"

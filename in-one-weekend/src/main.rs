@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate derive_new;
 extern crate nalgebra as na;
+extern crate rayon;
 extern crate structopt;
 
 use structopt::StructOpt;
@@ -25,23 +26,36 @@ struct Opt {
     #[structopt(
         short,
         long,
+        help = "sets the image format to either png or ppm",
         default_value = "png",
-        help = "sets the image format to either png or ppm"
     )]
     format: Format,
 
     #[structopt(
         short,
         long,
-        help = "sets the numbers of rays per image pixel"
+        help = "sets the numbers of rays per image pixel",
     )]
     sampling: u32,
+
+    #[structopt(
+        short,
+        long,
+        help = "sets the numbers of threads",
+        default_value = "0",
+    )]
+    threads: usize,
 }
 
 fn main() {
     let opt = Opt::from_args();
 
-    let mut image = Image::new_480p();
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(opt.threads)
+        .build_global()
+        .unwrap();
+
+    let mut image = Image::new_720p();
 
     let origin = Vec3::new(13.0, 2.0, 3.0);
     let look_at = -Vec3::z();

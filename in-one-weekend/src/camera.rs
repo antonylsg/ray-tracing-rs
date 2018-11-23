@@ -52,6 +52,7 @@ impl Camera {
         let random = self.lens_radius * random_on_unit_disk();
         let offset = random.x * self.u + random.y * self.v;
         let origin = self.origin + offset;
+
         let mut direction = self.lower_left_corner;
         direction += u * self.horizontal;
         direction += v * self.vertical;
@@ -63,8 +64,9 @@ impl Camera {
 
 fn random_on_unit_disk() -> Vec3 {
     loop {
-        let random = Vec3::new(rand::random(), rand::random(), rand::random());
+        let random = Vec3::new(rand::random(), rand::random(), 0.0);
         let random = 2.0 * random - Vec3::new(1.0, 1.0, 0.0);
+
         if random.norm_squared() < 1.0 {
             break random;
         }

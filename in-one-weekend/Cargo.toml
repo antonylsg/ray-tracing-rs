@@ -7,5 +7,7 @@ authors = ["Antony Lesage <lesage.antony@gmail.com>"]
 derive-new = "0.5"
 itertools = "0.7"
 nalgebra = "0.16"
+png = "0.13"
 rand = "0.6"
 rayon = "1.0"
+structopt = "0.2"

@@ -1,8 +1,9 @@
 #[macro_use]
 extern crate derive_new;
-extern crate itertools;
 extern crate nalgebra as na;
-extern crate rand;
+extern crate structopt;
+
+use structopt::StructOpt;
 
 mod camera;
 mod hit;
@@ -13,24 +14,31 @@ mod scene;
 mod sphere;
 
 use crate::camera::Camera;
+use crate::image::Format;
 use crate::image::Image;
 use crate::scene::Scene;
 
 type Vec3 = na::Vector3<f64>;
 
+#[derive(StructOpt)]
+struct Opt {
+    #[structopt(short, long)]
+    format: Format,
+
+    #[structopt(short, long)]
+    sampling: u32,
+}
+
 fn main() {
-    // let sampling = 32;
-    // let sampling = 64;
-    // let sampling = 128;
-    // let sampling = 256;
-    let sampling = 1024;
-    let image = Image::new_480p();
+    let opt = Opt::from_args();
+
+    let mut image = Image::new_480p();
 
     let origin = Vec3::new(13.0, 2.0, 3.0);
     let look_at = -Vec3::z();
     let vertical = Vec3::y();
     let fov = 20.0;
-    let aperture = 0.2;
+    let aperture = 0.1;
     let focus = (look_at - origin).norm();
     let camera = Camera::new(
         origin,
@@ -43,5 +51,6 @@ fn main() {
     );
     let scene = Scene::random();
 
-    print!("{}", image.par_render(&scene, &camera, sampling));
+    image.par_render(&scene, &camera, opt.sampling);
+    image.save_as(opt.format).unwrap();
 }

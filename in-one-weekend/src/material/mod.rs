@@ -1,5 +1,6 @@
+extern crate rand;
+
 use crate::hit;
-use crate::rand;
 use crate::ray::Ray;
 use crate::Vec3;
 

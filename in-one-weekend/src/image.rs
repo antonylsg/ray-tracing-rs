@@ -1,5 +1,9 @@
+#![allow(dead_code)]
+
+extern crate png;
 extern crate rayon;
 
+use self::png::HasParameters;
 use self::rayon::prelude::*;
 
 use crate::camera::Camera;
@@ -8,10 +12,55 @@ use crate::na;
 use crate::scene::Scene;
 use crate::Vec3;
 
+use std::fmt;
+use std::fs::File;
+use std::io;
+use std::io::BufWriter;
+use std::io::Write;
+use std::path::Path;
+use std::str::FromStr;
+
+#[derive(Debug)]
+pub struct ParseFormatError;
+
+pub enum Format {
+    Png,
+    Ppm,
+}
+
+impl Format {
+    fn as_str(&self) -> &str {
+        match self {
+            Format::Png => "png",
+            Format::Ppm => "ppm",
+        }
+    }
+}
+
+impl FromStr for Format {
+    type Err = ParseFormatError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "png" => Ok(Format::Png),
+            "ppm" => Ok(Format::Ppm),
+            _ => Err(ParseFormatError),
+        }
+    }
+}
+
+impl fmt::Display for ParseFormatError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "failed to parse format which is neither png, nor ppm")
+    }
+}
+
 #[derive(new)]
 pub struct Image {
     width: u32,
     height: u32,
+    #[new(default)]
+    buffer: Vec<u8>,
 }
 
 impl Image {
@@ -37,34 +86,66 @@ impl Image {
         self.width as f64 / self.height as f64
     }
 
-    pub fn par_render<T>(&self, scene: &Scene<T>, camera: &Camera, sampling: u32) -> String
+    pub fn par_render<T>(&mut self, scene: &Scene<T>, camera: &Camera, sampling: u32)
     where
         T: Hit + Sync,
     {
-        let header = vec![
-            "P3\n".to_string(),
-            format!("{} {}\n", self.width, self.height),
-            "255\n".to_string(),
-        ];
+        let body: Vec<u8> = (0..self.height)
+            .into_par_iter()
+            .rev()
+            .flat_map(|j| {
+                let width = self.width - 1;
+                let height = self.height - 1;
 
-        let body = (0..self.height).into_par_iter().rev().flat_map(|j| {
-            (0..self.width).into_par_iter().map(move |i| {
-                let color: Vec3 = (0..sampling)
-                    .map(|_| {
-                        let u = (i as f64 + rand::random::<f64>()) / (self.width - 1) as f64;
-                        let v = (j as f64 + rand::random::<f64>()) / (self.height - 1) as f64;
-                        scene.sample(camera, u, v)
-                    }).sum();
+                (0..self.width).into_par_iter().map(move |i| {
+                    let color: Vec3 = (0..sampling)
+                        .map(|_| {
+                            let u = (i as f64 + rand::random::<f64>()) / width as f64;
+                            let v = (j as f64 + rand::random::<f64>()) / height as f64;
+                            scene.sample(camera, u, v)
+                        }).sum();
 
-                let mut color = color / sampling as f64;
-                // Gamma correction
-                color.apply(f64::sqrt);
-                let color: na::Vector3<u8> = na::try_convert(255.0 * color).unwrap();
+                    let mut color = color / sampling as f64;
+                    // Gamma correction
+                    color.apply(f64::sqrt);
+                    let color: na::Vector3<u8> = na::try_convert(255.0 * color).unwrap();
 
-                format!("{} {} {}\n", color.x, color.y, color.z)
-            })
-        });
+                    vec![color.x, color.y, color.z]
+                })
+            }).flatten()
+            .collect();
 
-        header.into_par_iter().chain(body).collect()
+        self.buffer.extend(body);
+    }
+
+    fn save_as_png(&self, writer: impl Write) -> Result<(), png::EncodingError> {
+        let mut encoder = png::Encoder::new(writer, self.width, self.height);
+        encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
+
+        let mut writer = encoder.write_header()?;
+        writer.write_image_data(&self.buffer)
+    }
+
+    fn save_as_ppm(&self, mut writer: impl Write) -> io::Result<()> {
+        writeln!(writer, "P3")?;
+        writeln!(writer, "{} {}", self.width, self.height)?;
+        writeln!(writer, "255")?;
+        self.buffer
+            .chunks(3)
+            .try_for_each(|chunk| writeln!(writer, "{} {} {}", chunk[0], chunk[1], chunk[2]))
+    }
+
+    pub fn save_as(&self, format: Format) -> Result<(), png::EncodingError> {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("image")
+            .with_extension(format.as_str());
+        println!("path: {:?}", path);
+        let file = File::create(path).unwrap();
+        let writer = BufWriter::new(file);
+
+        match format {
+            Format::Png => self.save_as_png(writer),
+            Format::Ppm => self.save_as_ppm(writer).map_err(|err| err.into()),
+        }
     }
 }

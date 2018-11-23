@@ -1,8 +1,11 @@
+extern crate rand;
+
+use self::rand::Rng;
+
 use crate::hit;
 use crate::material;
 use crate::material::Material;
 use crate::material::Scattered;
-use crate::rand::Rng;
 use crate::ray::Ray;
 use crate::Vec3;
 

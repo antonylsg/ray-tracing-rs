@@ -5,6 +5,24 @@ use crate::Vec3;
 
 use std::cmp::Ordering;
 
+trait InspectOption<T> {
+    fn inspect<F>(self, f: F) -> Option<T>
+    where
+        F: FnMut(&T);
+}
+
+impl<T> InspectOption<T> for Option<T> {
+    fn inspect<F>(self, mut f: F) -> Option<T>
+    where
+        F: FnMut(&T),
+    {
+        if let Some(value) = &self {
+            f(value);
+        }
+        self
+    }
+}
+
 pub trait Hit {
     fn boxed(self) -> Box<dyn Hit>
     where
@@ -43,9 +61,13 @@ impl<T> Hit for Vec<T>
 where
     T: Hit,
 {
-    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Record> {
+    fn hit(&self, min: f64, mut max: f64, ray: &Ray) -> Option<Record> {
         self.iter()
-            .filter_map(|hitable| hitable.hit(min, max, ray))
+            .flat_map(|hitable| {
+                hitable
+                    .hit(min, max, ray)
+                    .inspect(|record| max = f64::min(max, record.parameter))
+            })
             .min_by(|a, b| {
                 a.parameter
                     .partial_cmp(&b.parameter)

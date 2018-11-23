@@ -11,6 +11,18 @@ pub struct Sphere {
     material: Box<dyn Material>,
 }
 
+impl Sphere {
+    pub fn stick_to(&mut self, other: &Sphere) {
+        if self.center == other.center {
+            return;
+        }
+
+        let direction = (self.center - other.center).normalize();
+        let norm = self.radius + other.radius;
+        self.center = norm * direction + other.center;
+    }
+}
+
 impl Intersect for Sphere {
     fn intersect(&self, other: &Sphere) -> bool {
         let distance2 = (self.center - other.center).norm_squared();

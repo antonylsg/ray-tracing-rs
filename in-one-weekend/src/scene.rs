@@ -51,19 +51,24 @@ impl<T> Scene<T> {
 
 impl Scene<Sphere> {
     pub fn random() -> Self {
+        const GROUND: f64 = 1_000.0;
         const RADIUS: f64 = 0.2;
 
+        let ground = Sphere::new(
+            Vec3::new(0.0, -GROUND, 0.0),
+            GROUND,
+            Lambertian::new(Vec3::new(0.5, 0.5, 0.5)).boxed(),
+        );
+
         let centers = vec![
-            Vec3::new(0.0, -1000.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
             Vec3::new(-4.0, 1.0, 0.0),
             Vec3::new(4.0, 1.0, 0.0),
         ];
 
-        let radii = vec![1000.0, 1.0, 1.0, 1.0];
+        let radii = vec![1.0, 1.0, 1.0];
 
         let materials = vec![
-            Lambertian::new(Vec3::new(0.5, 0.5, 0.5)).boxed(),
             Dielectric::new(1.5).boxed(),
             Lambertian::new(Vec3::new(0.4, 0.2, 0.1)).boxed(),
             Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0).boxed(),
@@ -89,6 +94,10 @@ impl Scene<Sphere> {
                 })
             }).collect();
         hitables.extend(spheres);
+        hitables
+            .iter_mut()
+            .for_each(|sphere| sphere.stick_to(&ground));
+        hitables.push(ground);
 
         Scene::new(hitables)
     }

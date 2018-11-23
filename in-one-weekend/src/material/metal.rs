@@ -26,7 +26,7 @@ impl Material for Metal {
             return None;
         }
 
-        let ray = ray.next(record.point, fuzzed);
+        let ray = ray.next(record.impact, fuzzed);
 
         Some(Scattered::new(ray, self.albedo))
     }

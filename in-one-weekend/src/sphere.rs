@@ -27,18 +27,18 @@ impl hit::Hit for Sphere {
 
         let root = (-b - sqrt) / a;
         if min <= root && root <= max {
-            let point = ray.point_at(root);
-            let normal = (point - self.center) / self.radius;
+            let impact = ray.impact_at(root);
+            let normal = (impact - self.center) / self.radius;
             let material = self.material.as_ref();
-            return Some(hit::Record::new(root, point, normal, material));
+            return Some(hit::Record::new(root, impact, normal, material));
         }
 
         let root = (-b + sqrt) / a;
         if min <= root && root <= max {
-            let point = ray.point_at(root);
-            let normal = (point - self.center) / self.radius;
+            let impact = ray.impact_at(root);
+            let normal = (impact - self.center) / self.radius;
             let material = self.material.as_ref();
-            return Some(hit::Record::new(root, point, normal, material));
+            return Some(hit::Record::new(root, impact, normal, material));
         }
 
         None

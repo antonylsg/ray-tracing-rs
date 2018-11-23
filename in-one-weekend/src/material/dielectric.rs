@@ -35,7 +35,7 @@ impl Material for Dielectric {
         let direction = refract(&ray.direction, &normal, ratio)
             .filter(|_| !rand::thread_rng().gen_bool(schlick(cosine, self.index)))
             .unwrap_or_else(|| material::reflect(&ray.direction, &normal));
-        let ray = ray.next(record.point, direction);
+        let ray = ray.next(record.impact, direction);
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
         Some(Scattered::new(ray, attenuation))
     }

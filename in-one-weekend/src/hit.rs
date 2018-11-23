@@ -37,7 +37,7 @@ pub trait Hit {
 #[derive(new)]
 pub struct Record<'m> {
     parameter: f64,
-    pub point: Vec3,
+    pub impact: Vec3,
     pub normal: Vec3,
     material: &'m dyn Material,
 }

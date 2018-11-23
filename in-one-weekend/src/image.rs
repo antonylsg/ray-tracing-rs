@@ -142,7 +142,7 @@ impl Image {
 
     pub fn save_as(&self, format: Format) -> Result<(), png::EncodingError> {
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("image")
+            .join(format!("{}p", self.height))
             .with_extension(format.as_str());
         let file = File::create(path).unwrap();
         let writer = BufWriter::new(file);

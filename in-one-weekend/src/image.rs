@@ -92,11 +92,12 @@ impl fmt::Display for ParseResolutionError {
 pub struct Image {
     width: u32,
     height: u32,
+    sampling: u32,
     buffer: Vec<u8>,
 }
 
 impl Image {
-    pub fn new(resolution: Resolution) -> Image {
+    pub fn new(resolution: Resolution, sampling: u32) -> Image {
         let (width, height) = match resolution {
             Resolution::P480 => (720, 480),
             Resolution::P720 => (1280, 720),
@@ -107,6 +108,7 @@ impl Image {
         Image {
             width,
             height,
+            sampling,
             buffer: Vec::new(),
         }
     }
@@ -115,10 +117,11 @@ impl Image {
         f64::from(self.width) / f64::from(self.height)
     }
 
-    pub fn par_render<T>(&mut self, scene: &Scene<T>, camera: &Camera, sampling: u32)
+    pub fn par_render<T>(&mut self, scene: &Scene<T>, camera: &Camera)
     where
         T: Hit + Sync,
     {
+        let sampling = self.sampling;
         let body: Vec<u8> = (0..self.height)
             .into_par_iter()
             .rev()
@@ -164,9 +167,9 @@ impl Image {
             .try_for_each(|chunk| writeln!(writer, "{} {} {}", chunk[0], chunk[1], chunk[2]))
     }
 
-    pub fn save_as(&self, format: Format, sampling: u32) -> Result<(), png::EncodingError> {
+    pub fn save_as(&self, format: Format) -> Result<(), png::EncodingError> {
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join(format!("{}p@{}", self.height, sampling))
+            .join(format!("{}p@{}", self.height, self.sampling))
             .with_extension(format.as_str());
         let file = File::create(path).unwrap();
         let writer = BufWriter::new(file);

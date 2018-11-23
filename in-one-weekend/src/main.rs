@@ -64,7 +64,7 @@ fn main() {
         .build_global()
         .unwrap();
 
-    let mut image = Image::new(opt.resolution);
+    let mut image = Image::new(opt.resolution, opt.sampling);
 
     let origin = Vec3::new(13.0, 2.0, 3.0);
     let look_at = -Vec3::z();
@@ -83,6 +83,6 @@ fn main() {
     );
     let scene = Scene::random();
 
-    image.par_render(&scene, &camera, opt.sampling);
-    image.save_as(opt.format, opt.sampling).unwrap();
+    image.par_render(&scene, &camera);
+    image.save_as(opt.format).unwrap();
 }

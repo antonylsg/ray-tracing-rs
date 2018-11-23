@@ -54,37 +54,61 @@ impl fmt::Display for ParseFormatError {
     }
 }
 
-#[derive(new)]
+#[derive(Debug)]
+pub struct ParseResolutionError;
+
+#[derive(Clone, Copy)]
+pub enum Resolution {
+    /// 720×480 (3:2)
+    P480,
+    /// 1280×720 (16:9) or HD Ready
+    P720,
+    /// 1920×1080 (16:9) or Full HD
+    P1080,
+    /// 3840×2160 (16:9) or Ultra HD
+    P2160,
+}
+
+impl FromStr for Resolution {
+    type Err = ParseResolutionError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "480p" | "480" => Ok(Resolution::P480),
+            "720p" | "720" => Ok(Resolution::P720),
+            "1080p" | "1080" => Ok(Resolution::P1080),
+            "2160p" | "2160" => Ok(Resolution::P2160),
+            _ => Err(ParseResolutionError),
+        }
+    }
+}
+
+impl fmt::Display for ParseResolutionError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "failed to parse resolution")
+    }
+}
+
 pub struct Image {
     width: u32,
     height: u32,
-    #[new(default)]
     buffer: Vec<u8>,
 }
 
 impl Image {
-    /// 720×480 (3:2)
-    #[allow(dead_code)]
-    pub fn new_480p() -> Image {
-        Image::new(720, 480)
-    }
+    pub fn new(resolution: Resolution) -> Image {
+        let (width, height) = match resolution {
+            Resolution::P480 => (720, 480),
+            Resolution::P720 => (1280, 720),
+            Resolution::P1080 => (1920, 1080),
+            Resolution::P2160 => (3840, 2160),
+        };
 
-    /// 1280×720 (16:9) or HD Ready
-    #[allow(dead_code)]
-    pub fn new_720p() -> Image {
-        Image::new(1280, 720)
-    }
-
-    /// 1920×1080 (16:9) or Full HD
-    #[allow(dead_code)]
-    pub fn new_1080p() -> Image {
-        Image::new(1920, 1080)
-    }
-
-    /// 3840×2160 (16:9) or Ultra HD
-    #[allow(dead_code)]
-    pub fn new_2160p() -> Image {
-        Image::new(3840, 2160)
+        Image {
+            width,
+            height,
+            buffer: Vec::new(),
+        }
     }
 
     pub fn aspect(&self) -> f64 {
@@ -140,9 +164,9 @@ impl Image {
             .try_for_each(|chunk| writeln!(writer, "{} {} {}", chunk[0], chunk[1], chunk[2]))
     }
 
-    pub fn save_as(&self, format: Format) -> Result<(), png::EncodingError> {
+    pub fn save_as(&self, format: Format, sampling: u32) -> Result<(), png::EncodingError> {
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join(format!("{}p", self.height))
+            .join(format!("{}p@{}", self.height, sampling))
             .with_extension(format.as_str());
         let file = File::create(path).unwrap();
         let writer = BufWriter::new(file);

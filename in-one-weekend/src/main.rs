@@ -17,6 +17,7 @@ mod shape;
 use crate::camera::Camera;
 use crate::image::Format;
 use crate::image::Image;
+use crate::image::Resolution;
 use crate::scene::Scene;
 
 type Vec3 = na::Vector3<f64>;
@@ -30,6 +31,14 @@ struct Opt {
         default_value = "png",
     )]
     format: Format,
+
+    #[structopt(
+        short,
+        long,
+        help = "sets the image resolution",
+        default_value = "480p",
+    )]
+    resolution: Resolution,
 
     #[structopt(
         short,
@@ -55,7 +64,7 @@ fn main() {
         .build_global()
         .unwrap();
 
-    let mut image = Image::new_720p();
+    let mut image = Image::new(opt.resolution);
 
     let origin = Vec3::new(13.0, 2.0, 3.0);
     let look_at = -Vec3::z();
@@ -75,5 +84,5 @@ fn main() {
     let scene = Scene::random();
 
     image.par_render(&scene, &camera, opt.sampling);
-    image.save_as(opt.format).unwrap();
+    image.save_as(opt.format, opt.sampling).unwrap();
 }

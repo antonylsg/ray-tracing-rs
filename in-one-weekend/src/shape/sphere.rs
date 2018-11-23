@@ -40,7 +40,7 @@ impl Intersect<Sphere> for [Sphere] {
 }
 
 impl hit::Hit for Sphere {
-    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<hit::Record> {
+    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<hit::Impact> {
         let centered = ray.origin - self.center;
         let a = ray.direction.norm_squared();
         // 2.0 cancels out
@@ -56,18 +56,18 @@ impl hit::Hit for Sphere {
 
         let root = (-b - sqrt) / a;
         if min <= root && root <= max {
-            let impact = ray.impact_at(root);
-            let normal = (impact - self.center) / self.radius;
+            let point = ray.point_at(root);
+            let normal = (point - self.center) / self.radius;
             let material = self.material.as_ref();
-            return Some(hit::Record::new(root, impact, normal, material));
+            return Some(hit::Impact::new(root, point, normal, material));
         }
 
         let root = (-b + sqrt) / a;
         if min <= root && root <= max {
-            let impact = ray.impact_at(root);
-            let normal = (impact - self.center) / self.radius;
+            let point = ray.point_at(root);
+            let normal = (point - self.center) / self.radius;
             let material = self.material.as_ref();
-            return Some(hit::Record::new(root, impact, normal, material));
+            return Some(hit::Impact::new(root, point, normal, material));
         }
 
         None

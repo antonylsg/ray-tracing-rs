@@ -20,7 +20,7 @@ pub trait Material: Send + Sync {
         Box::new(self)
     }
 
-    fn scatter(&self, ray: Ray, record: &hit::Record) -> Option<Scattered>;
+    fn scatter(&self, ray: Ray, impact: &hit::Impact) -> Option<Scattered>;
 }
 
 #[derive(new)]

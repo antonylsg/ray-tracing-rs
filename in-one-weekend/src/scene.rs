@@ -28,8 +28,8 @@ impl<T> Scene<T> {
     where
         T: Hit,
     {
-        if let Some(record) = self.hitables.hit(1e-6, std::f64::INFINITY, &ray) {
-            if let (true, Some(scattered)) = (ray.is_active(), record.scatter(ray)) {
+        if let Some(impact) = self.hitables.hit(1e-6, std::f64::INFINITY, &ray) {
+            if let (true, Some(scattered)) = (ray.is_active(), impact.scatter(ray)) {
                 let color = self.color(scattered.ray);
                 return scattered.attenuation.component_mul(&color);
             }

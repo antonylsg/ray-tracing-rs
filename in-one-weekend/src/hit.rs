@@ -31,18 +31,18 @@ pub trait Hit {
         Box::new(self)
     }
 
-    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Record>;
+    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Impact>;
 }
 
 #[derive(new)]
-pub struct Record<'m> {
+pub struct Impact<'m> {
     parameter: f64,
-    pub impact: Vec3,
+    pub point: Vec3,
     pub normal: Vec3,
     material: &'m dyn Material,
 }
 
-impl<'m> Record<'m> {
+impl<'m> Impact<'m> {
     pub fn scatter(&self, ray: Ray) -> Option<Scattered> {
         self.material.scatter(ray, self)
     }
@@ -52,7 +52,7 @@ impl<T> Hit for Box<T>
 where
     T: Hit,
 {
-    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Record> {
+    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Impact> {
         (**self).hit(min, max, ray)
     }
 }
@@ -61,12 +61,12 @@ impl<T> Hit for Vec<T>
 where
     T: Hit,
 {
-    fn hit(&self, min: f64, mut max: f64, ray: &Ray) -> Option<Record> {
+    fn hit(&self, min: f64, mut max: f64, ray: &Ray) -> Option<Impact> {
         self.iter()
             .flat_map(|hitable| {
                 hitable
                     .hit(min, max, ray)
-                    .inspect(|record| max = f64::min(max, record.parameter))
+                    .inspect(|impact| max = f64::min(max, impact.parameter))
             }).min_by(|a, b| {
                 a.parameter
                     .partial_cmp(&b.parameter)

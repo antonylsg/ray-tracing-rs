@@ -16,18 +16,18 @@ pub struct Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, ray: Ray, record: &hit::Record) -> Option<Scattered> {
+    fn scatter(&self, ray: Ray, impact: &hit::Impact) -> Option<Scattered> {
         let normal;
         let ratio;
         let cosine;
 
-        let dot = ray.direction.dot(&record.normal);
+        let dot = ray.direction.dot(&impact.normal);
         if dot.is_sign_negative() {
-            normal = record.normal;
+            normal = impact.normal;
             ratio = self.index.recip();
             cosine = -dot;
         } else {
-            normal = -record.normal;
+            normal = -impact.normal;
             ratio = self.index;
             cosine = dot;
         }
@@ -35,7 +35,7 @@ impl Material for Dielectric {
         let direction = refract(&ray.direction, &normal, ratio)
             .filter(|_| !rand::thread_rng().gen_bool(schlick(cosine, self.index)))
             .unwrap_or_else(|| material::reflect(&ray.direction, &normal));
-        let ray = ray.next(record.impact, direction);
+        let ray = ray.next(impact.point, direction);
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
         Some(Scattered::new(ray, attenuation))
     }

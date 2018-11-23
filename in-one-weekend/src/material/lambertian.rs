@@ -11,9 +11,9 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, ray: Ray, record: &hit::Record) -> Option<Scattered> {
-        let direction = record.normal + shape::random_in_unit_sphere();
-        let ray = ray.next(record.impact, direction);
+    fn scatter(&self, ray: Ray, impact: &hit::Impact) -> Option<Scattered> {
+        let direction = impact.normal + shape::random_in_unit_sphere();
+        let ray = ray.next(impact.point, direction);
 
         Some(Scattered::new(ray, self.albedo))
     }

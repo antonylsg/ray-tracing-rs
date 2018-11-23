@@ -18,15 +18,15 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: Ray, record: &hit::Record) -> Option<Scattered> {
-        let reflected = reflect(&ray.direction, &record.normal);
+    fn scatter(&self, ray: Ray, impact: &hit::Impact) -> Option<Scattered> {
+        let reflected = reflect(&ray.direction, &impact.normal);
         let fuzzed = reflected + self.fuzz * shape::random_in_unit_sphere();
 
-        if fuzzed.dot(&record.normal).is_sign_negative() {
+        if fuzzed.dot(&impact.normal).is_sign_negative() {
             return None;
         }
 
-        let ray = ray.next(record.impact, fuzzed);
+        let ray = ray.next(impact.point, fuzzed);
 
         Some(Scattered::new(ray, self.albedo))
     }

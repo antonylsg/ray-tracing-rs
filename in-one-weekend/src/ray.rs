@@ -29,7 +29,7 @@ impl Ray {
         }
     }
 
-    pub fn impact_at(&self, t: f64) -> Vec3 {
+    pub fn point_at(&self, t: f64) -> Vec3 {
         self.origin + t * self.direction
     }
 }

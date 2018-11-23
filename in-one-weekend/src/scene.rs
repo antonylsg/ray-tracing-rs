@@ -51,8 +51,12 @@ impl<T> Scene<T> {
 
 impl Scene<Sphere> {
     pub fn random() -> Self {
+        /// Ball radius
+        const BALL: f64 = 1.0;
+        /// Ground radius
         const GROUND: f64 = 1_000.0;
-        const RADIUS: f64 = 0.2;
+        /// Marble radius
+        const MARBLE: f64 = 0.2;
 
         let ground = Sphere::new(
             Vec3::new(0.0, -GROUND, 0.0),
@@ -61,12 +65,10 @@ impl Scene<Sphere> {
         );
 
         let centers = vec![
-            Vec3::new(0.0, 1.0, 0.0),
-            Vec3::new(-4.0, 1.0, 0.0),
-            Vec3::new(4.0, 1.0, 0.0),
+            Vec3::new(-4.0, BALL, 0.0),
+            Vec3::new(0.0, BALL, 0.0),
+            Vec3::new(4.0, BALL, 0.0),
         ];
-
-        let radii = vec![1.0, 1.0, 1.0];
 
         let materials = vec![
             Dielectric::new(1.5).boxed(),
@@ -74,8 +76,8 @@ impl Scene<Sphere> {
             Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0).boxed(),
         ];
 
-        let mut spheres: Vec<Sphere> = itertools::multizip((centers, radii, materials))
-            .map(|(center, radius, material)| Sphere::new(center, radius, material))
+        let mut spheres: Vec<Sphere> = itertools::multizip((centers, materials))
+            .map(|(center, material)| Sphere::new(center, BALL, material))
             .map(|sphere| sphere.stick_to(&ground))
             .collect();
 
@@ -84,9 +86,9 @@ impl Scene<Sphere> {
                 loop {
                     let x = a + 0.9 * rand::random::<f64>();
                     let z = b + 0.9 * rand::random::<f64>();
-                    let center = Vec3::new(x, RADIUS, z);
+                    let center = Vec3::new(x, MARBLE, z);
 
-                    let sphere = Sphere::new(center, RADIUS, material::random());
+                    let sphere = Sphere::new(center, MARBLE, material::random());
                     if !spheres.intersect(&sphere) {
                         spheres.push(sphere.stick_to(&ground));
                     };

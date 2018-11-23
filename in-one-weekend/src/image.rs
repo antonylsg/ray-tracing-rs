@@ -144,7 +144,6 @@ impl Image {
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("image")
             .with_extension(format.as_str());
-        println!("path: {:?}", path);
         let file = File::create(path).unwrap();
         let writer = BufWriter::new(file);
 

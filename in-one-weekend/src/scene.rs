@@ -15,7 +15,7 @@ pub struct Scene<T> {
 }
 
 impl<T> Scene<T> {
-    fn background(ray: Ray) -> Vec3 {
+    fn background(ray: &Ray) -> Vec3 {
         let t = 0.5 * (1.0 + ray.direction.y);
         let white = Vec3::new(1.0, 1.0, 1.0);
         let blue = Vec3::new(0.5, 0.7, 1.0);
@@ -36,7 +36,7 @@ impl<T> Scene<T> {
             return Vec3::zeros();
         }
 
-        Self::background(ray)
+        Self::background(&ray)
     }
 
     pub fn sample(&self, camera: &Camera, u: f64, v: f64) -> Vec3

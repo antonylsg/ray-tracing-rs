@@ -21,6 +21,7 @@ use std::str::FromStr;
 #[derive(Debug)]
 pub struct ParseFormatError;
 
+#[derive(Clone, Copy)]
 pub enum Format {
     Png,
     Ppm,
@@ -81,7 +82,7 @@ impl Image {
     }
 
     pub fn aspect(&self) -> f64 {
-        self.width as f64 / self.height as f64
+        f64::from(self.width) / f64::from(self.height)
     }
 
     pub fn par_render<T>(&mut self, scene: &Scene<T>, camera: &Camera, sampling: u32)
@@ -92,18 +93,18 @@ impl Image {
             .into_par_iter()
             .rev()
             .flat_map(|j| {
-                let width = self.width - 1;
-                let height = self.height - 1;
+                let width = f64::from(self.width - 1);
+                let height = f64::from(self.height - 1);
 
                 (0..self.width).into_par_iter().map(move |i| {
                     let color: Vec3 = (0..sampling)
                         .map(|_| {
-                            let u = (i as f64 + rand::random::<f64>()) / width as f64;
-                            let v = (j as f64 + rand::random::<f64>()) / height as f64;
+                            let u = (f64::from(i) + rand::random::<f64>()) / width;
+                            let v = (f64::from(j) + rand::random::<f64>()) / height;
                             scene.sample(camera, u, v)
                         }).sum();
 
-                    let mut color = color / sampling as f64;
+                    let mut color = color / f64::from(sampling);
                     // Gamma correction
                     color.apply(f64::sqrt);
                     let color: na::Vector3<u8> = na::try_convert(255.0 * color).unwrap();

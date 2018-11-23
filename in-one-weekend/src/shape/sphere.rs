@@ -12,14 +12,15 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn stick_to(&mut self, other: &Sphere) {
+    pub fn stick_to(mut self, other: &Sphere) -> Self {
         if self.center == other.center {
-            return;
+            return self;
         }
 
         let direction = (self.center - other.center).normalize();
         let norm = self.radius + other.radius;
         self.center = norm * direction + other.center;
+        self
     }
 }
 

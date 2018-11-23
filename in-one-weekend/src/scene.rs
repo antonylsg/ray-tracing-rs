@@ -74,32 +74,29 @@ impl Scene<Sphere> {
             Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0).boxed(),
         ];
 
-        let spheres: Vec<Sphere> = itertools::multizip((centers, radii, materials))
+        let mut spheres: Vec<Sphere> = itertools::multizip((centers, radii, materials))
             .map(|(center, radius, material)| Sphere::new(center, radius, material))
+            .map(|sphere| sphere.stick_to(&ground))
             .collect();
 
-        let mut hitables: Vec<Sphere> = (-11..11)
-            .map(f64::from)
-            .flat_map(|a| {
-                let spheres = &spheres;
-                (-11..11).map(f64::from).map(move |b| loop {
+        for a in (-11..11).map(f64::from) {
+            for b in (-11..11).map(f64::from) {
+                loop {
                     let x = a + 0.9 * rand::random::<f64>();
                     let z = b + 0.9 * rand::random::<f64>();
                     let center = Vec3::new(x, RADIUS, z);
 
                     let sphere = Sphere::new(center, RADIUS, material::random());
                     if !spheres.intersect(&sphere) {
-                        break sphere;
-                    }
-                })
-            }).collect();
-        hitables.extend(spheres);
-        hitables
-            .iter_mut()
-            .for_each(|sphere| sphere.stick_to(&ground));
-        hitables.push(ground);
+                        spheres.push(sphere.stick_to(&ground));
+                    };
+                }
+            }
+        }
 
-        Scene::new(hitables)
+        spheres.push(ground);
+
+        Scene::new(spheres)
     }
 
     #[allow(dead_code)]

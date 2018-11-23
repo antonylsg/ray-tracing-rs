@@ -6,7 +6,8 @@ use crate::material::Lambertian;
 use crate::material::Material;
 use crate::material::Metal;
 use crate::ray::Ray;
-use crate::sphere::Sphere;
+use crate::shape::Intersect;
+use crate::shape::Sphere;
 use crate::Vec3;
 
 #[derive(new)]
@@ -68,21 +69,26 @@ impl Scene<Sphere> {
             Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0).boxed(),
         ];
 
-        let last = itertools::multizip((centers, radii, materials))
-            .map(|(center, radius, material)| Sphere::new(center, radius, material));
+        let spheres: Vec<Sphere> = itertools::multizip((centers, radii, materials))
+            .map(|(center, radius, material)| Sphere::new(center, radius, material))
+            .collect();
 
-        let hitables = (-11..11)
+        let mut hitables: Vec<Sphere> = (-11..11)
             .map(f64::from)
             .flat_map(|a| {
-                (-11..11).map(f64::from).map(move |b| {
+                let spheres = &spheres;
+                (-11..11).map(f64::from).map(move |b| loop {
                     let x = a + 0.9 * rand::random::<f64>();
                     let z = b + 0.9 * rand::random::<f64>();
                     let center = Vec3::new(x, RADIUS, z);
 
-                    Sphere::new(center, RADIUS, material::random())
+                    let sphere = Sphere::new(center, RADIUS, material::random());
+                    if !spheres.intersect(&sphere) {
+                        break sphere;
+                    }
                 })
-            }).chain(last)
-            .collect();
+            }).collect();
+        hitables.extend(spheres);
 
         Scene::new(hitables)
     }

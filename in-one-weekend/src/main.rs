@@ -11,7 +11,7 @@ mod image;
 mod material;
 mod ray;
 mod scene;
-mod sphere;
+mod shape;
 
 use crate::camera::Camera;
 use crate::image::Format;

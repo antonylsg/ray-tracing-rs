@@ -1,6 +1,7 @@
 use crate::hit;
 use crate::material::Material;
 use crate::ray::Ray;
+use crate::shape::Intersect;
 use crate::Vec3;
 
 #[derive(new)]
@@ -8,6 +9,21 @@ pub struct Sphere {
     center: Vec3,
     radius: f64,
     material: Box<dyn Material>,
+}
+
+impl Intersect for Sphere {
+    fn intersect(&self, other: &Sphere) -> bool {
+        let distance2 = (self.center - other.center).norm_squared();
+        let radii2 = (self.radius + other.radius).powi(2);
+
+        distance2 < radii2
+    }
+}
+
+impl Intersect<Sphere> for [Sphere] {
+    fn intersect(&self, other: &Sphere) -> bool {
+        self.iter().any(|sphere| sphere.intersect(other))
+    }
 }
 
 impl hit::Hit for Sphere {
@@ -45,7 +61,7 @@ impl hit::Hit for Sphere {
     }
 }
 
-pub fn random_inside() -> Vec3 {
+pub fn random_in_unit_sphere() -> Vec3 {
     loop {
         let random = Vec3::new(rand::random(), rand::random(), rand::random());
         let random = 2.0 * random - Vec3::new(1.0, 1.0, 1.0);

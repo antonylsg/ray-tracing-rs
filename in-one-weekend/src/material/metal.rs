@@ -2,7 +2,7 @@ use crate::hit;
 use crate::material::Material;
 use crate::material::Scattered;
 use crate::ray::Ray;
-use crate::sphere;
+use crate::shape;
 use crate::Vec3;
 
 pub struct Metal {
@@ -20,7 +20,7 @@ impl Metal {
 impl Material for Metal {
     fn scatter(&self, ray: Ray, record: &hit::Record) -> Option<Scattered> {
         let reflected = reflect(&ray.direction, &record.normal);
-        let fuzzed = reflected + self.fuzz * sphere::random_inside();
+        let fuzzed = reflected + self.fuzz * shape::random_in_unit_sphere();
 
         if fuzzed.dot(&record.normal).is_sign_negative() {
             return None;

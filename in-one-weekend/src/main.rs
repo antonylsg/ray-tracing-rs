@@ -22,10 +22,19 @@ type Vec3 = na::Vector3<f64>;
 
 #[derive(StructOpt)]
 struct Opt {
-    #[structopt(short, long)]
+    #[structopt(
+        short,
+        long,
+        default_value = "png",
+        help = "sets the image format to either png or ppm"
+    )]
     format: Format,
 
-    #[structopt(short, long)]
+    #[structopt(
+        short,
+        long,
+        help = "sets the numbers of rays per image pixel"
+    )]
     sampling: u32,
 }
 

@@ -67,8 +67,7 @@ where
                 hitable
                     .hit(min, max, ray)
                     .inspect(|record| max = f64::min(max, record.parameter))
-            })
-            .min_by(|a, b| {
+            }).min_by(|a, b| {
                 a.parameter
                     .partial_cmp(&b.parameter)
                     .unwrap_or(Ordering::Equal)

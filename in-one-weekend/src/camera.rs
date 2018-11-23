@@ -1,3 +1,4 @@
+use crate::image::Pixel;
 use crate::ray::Ray;
 use crate::Vec3;
 
@@ -48,14 +49,14 @@ impl Camera {
         }
     }
 
-    pub fn cast(&self, u: f64, v: f64) -> Ray {
+    pub fn cast_towards(&self, pixel: Pixel) -> Ray {
         let random = self.lens_radius * random_on_unit_disk();
         let offset = random.x * self.u + random.y * self.v;
         let origin = self.origin + offset;
 
         let mut direction = self.lower_left_corner;
-        direction += u * self.horizontal;
-        direction += v * self.vertical;
+        direction += pixel.x * self.horizontal;
+        direction += pixel.y * self.vertical;
         direction -= origin;
 
         Ray::new(origin, direction)

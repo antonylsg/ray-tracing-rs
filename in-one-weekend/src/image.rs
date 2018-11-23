@@ -18,6 +18,8 @@ use std::io::Write;
 use std::path::Path;
 use std::str::FromStr;
 
+pub type Pixel = na::Vector2<f64>;
+
 #[derive(Debug)]
 pub struct ParseFormatError;
 
@@ -134,7 +136,7 @@ impl Image {
                         .map(|_| {
                             let u = (f64::from(i) + rand::random::<f64>()) / width;
                             let v = (f64::from(j) + rand::random::<f64>()) / height;
-                            scene.sample(camera, u, v)
+                            scene.sample(camera, Pixel::new(u, v))
                         }).sum();
 
                     let mut color = color / f64::from(sampling);

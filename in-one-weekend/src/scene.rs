@@ -1,5 +1,6 @@
 use crate::camera::Camera;
 use crate::hit::Hit;
+use crate::image::Pixel;
 use crate::material;
 use crate::material::Dielectric;
 use crate::material::Lambertian;
@@ -40,11 +41,11 @@ impl<T> Scene<T> {
         Self::background(&ray)
     }
 
-    pub fn sample(&self, camera: &Camera, u: f64, v: f64) -> Vec3
+    pub fn sample(&self, camera: &Camera, pixel: Pixel) -> Vec3
     where
         T: Hit,
     {
-        let ray = camera.cast(u, v);
+        let ray = camera.cast_towards(pixel);
         self.color(ray)
     }
 }

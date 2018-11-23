@@ -63,22 +63,28 @@ pub struct Image {
 }
 
 impl Image {
-    /// 720×480
+    /// 720×480 (3:2)
     #[allow(dead_code)]
     pub fn new_480p() -> Image {
         Image::new(720, 480)
     }
 
-    /// 1280×720
+    /// 1280×720 (16:9) or HD Ready
     #[allow(dead_code)]
     pub fn new_720p() -> Image {
         Image::new(1280, 720)
     }
 
-    /// 1920×1080
+    /// 1920×1080 (16:9) or Full HD
     #[allow(dead_code)]
     pub fn new_1080p() -> Image {
         Image::new(1920, 1080)
+    }
+
+    /// 3840×2160 (16:9) or Ultra HD
+    #[allow(dead_code)]
+    pub fn new_2160p() -> Image {
+        Image::new(3840, 2160)
     }
 
     pub fn aspect(&self) -> f64 {

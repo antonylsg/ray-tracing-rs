@@ -32,7 +32,6 @@ impl Camera {
         let u = vertical.cross(&w).normalize();
         let v = w.cross(&u).normalize();
 
-        // let lower_left_corner = Vec3::new(-half_width, -half_height, -1.0);
         let lower_left_corner = origin - focus * (half_width * u + half_height * v + w);
         let horizontal = 2.0 * focus * half_width * u;
         let vertical = 2.0 * focus * half_height * v;

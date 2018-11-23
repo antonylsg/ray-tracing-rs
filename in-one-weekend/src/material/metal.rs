@@ -22,9 +22,6 @@ impl Material for Metal {
         let reflected = reflect(&ray.direction, &record.normal);
         let fuzzed = reflected + self.fuzz * sphere::random_inside();
 
-        // Should be always true...
-        // assert!(reflected.dot(&record.normal) > 0.0);
-        // Should be always false...
         if fuzzed.dot(&record.normal).is_sign_negative() {
             return None;
         }

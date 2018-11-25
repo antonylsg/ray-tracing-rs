@@ -49,7 +49,8 @@ impl Camera {
         }
     }
 
-    pub fn cast_towards(&self, pixel: Pixel) -> Ray {
+    /// Gathers `Ray` (light) for the given `Camera` `Pixel`.
+    pub fn gather(&self, pixel: Pixel) -> Ray {
         let random = self.lens_radius * random_on_unit_disk();
         let offset = random.x * self.u + random.y * self.v;
         let origin = self.origin + offset;

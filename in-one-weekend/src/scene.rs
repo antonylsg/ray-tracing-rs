@@ -45,7 +45,7 @@ impl<T> Scene<T> {
     where
         T: Hit,
     {
-        let ray = camera.cast_towards(pixel);
+        let ray = camera.gather(pixel);
         self.color(ray)
     }
 }

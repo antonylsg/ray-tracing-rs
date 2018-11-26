@@ -178,7 +178,7 @@ impl Image {
 
         match format {
             Format::Png => self.save_as_png(writer),
-            Format::Ppm => self.save_as_ppm(writer).map_err(|err| err.into()),
+            Format::Ppm => self.save_as_ppm(writer).map_err(Into::into),
         }
     }
 }

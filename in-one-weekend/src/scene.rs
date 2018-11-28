@@ -72,8 +72,8 @@ impl Scene<Sphere> {
         ];
 
         let materials = vec![
-            Dielectric::new(1.5).boxed(),
             Lambertian::new(Vec3::new(0.4, 0.2, 0.1)).boxed(),
+            Dielectric::new(1.5).boxed(),
             Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0).boxed(),
         ];
 
@@ -92,7 +92,8 @@ impl Scene<Sphere> {
                     let sphere = Sphere::new(center, MARBLE, material::random());
                     if !spheres.intersect(&sphere) {
                         spheres.push(sphere.stick_to(&ground));
-                    };
+                        break;
+                    }
                 }
             }
         }

@@ -1,5 +1,7 @@
 use png::HasParameters;
 use rayon::prelude::*;
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 use crate::camera::Camera;
 use crate::hit::Hit;
@@ -7,85 +9,36 @@ use crate::na;
 use crate::scene::Scene;
 use crate::Vec3;
 
-use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::BufWriter;
 use std::io::Write;
 use std::path::Path;
-use std::str::FromStr;
 
 pub type Pixel = na::Vector2<f64>;
 
-#[derive(Debug)]
-pub struct ParseFormatError;
-
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, EnumString, Display)]
 pub enum Format {
+    #[strum(serialize = "png")]
     Png,
+    #[strum(serialize = "ppm")]
     Ppm,
 }
 
-impl Format {
-    fn as_str(&self) -> &str {
-        match self {
-            Format::Png => "png",
-            Format::Ppm => "ppm",
-        }
-    }
-}
-
-impl FromStr for Format {
-    type Err = ParseFormatError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "png" => Ok(Format::Png),
-            "ppm" => Ok(Format::Ppm),
-            _ => Err(ParseFormatError),
-        }
-    }
-}
-
-impl fmt::Display for ParseFormatError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "failed to parse format which is neither png, nor ppm")
-    }
-}
-
-#[derive(Debug)]
-pub struct ParseResolutionError;
-
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, EnumString)]
 pub enum Resolution {
     /// 720×480 (3:2)
+    #[strum(serialize = "480p", serialize = "480")]
     P480,
     /// 1280×720 (16:9) or HD Ready
+    #[strum(serialize = "720p", serialize = "720")]
     P720,
     /// 1920×1080 (16:9) or Full HD
+    #[strum(serialize = "1080p", serialize = "1080")]
     P1080,
     /// 3840×2160 (16:9) or Ultra HD
+    #[strum(serialize = "2160p", serialize = "2160")]
     P2160,
-}
-
-impl FromStr for Resolution {
-    type Err = ParseResolutionError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "480p" | "480" => Ok(Resolution::P480),
-            "720p" | "720" => Ok(Resolution::P720),
-            "1080p" | "1080" => Ok(Resolution::P1080),
-            "2160p" | "2160" => Ok(Resolution::P2160),
-            _ => Err(ParseResolutionError),
-        }
-    }
-}
-
-impl fmt::Display for ParseResolutionError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "failed to parse resolution")
-    }
 }
 
 pub struct Image {
@@ -171,7 +124,7 @@ impl Image {
     pub fn save_as(&self, format: Format) -> Result<(), png::EncodingError> {
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join(format!("{}p@{}", self.height, self.sampling))
-            .with_extension(format.as_str());
+            .with_extension(format.to_string());
         let file = File::create(path).unwrap();
         let writer = BufWriter::new(file);
 

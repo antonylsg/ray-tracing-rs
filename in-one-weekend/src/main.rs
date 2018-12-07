@@ -1,9 +1,4 @@
-#[macro_use]
-extern crate derive_new;
-extern crate nalgebra as na;
-extern crate rayon;
-extern crate structopt;
-
+use nalgebra as na;
 use structopt::StructOpt;
 
 mod camera;
@@ -28,7 +23,7 @@ struct Opt {
         short,
         long,
         help = "sets the image format to either png or ppm",
-        default_value = "png",
+        default_value = "png"
     )]
     format: Format,
 
@@ -36,23 +31,14 @@ struct Opt {
         short,
         long,
         help = "sets the image resolution",
-        default_value = "480p",
+        default_value = "480p"
     )]
     resolution: Resolution,
 
-    #[structopt(
-        short,
-        long,
-        help = "sets the numbers of rays per image pixel",
-    )]
+    #[structopt(short, long, help = "sets the numbers of rays per image pixel")]
     sampling: u32,
 
-    #[structopt(
-        short,
-        long,
-        help = "sets the numbers of threads",
-        default_value = "0",
-    )]
+    #[structopt(short, long, help = "sets the numbers of threads", default_value = "0")]
     threads: usize,
 }
 

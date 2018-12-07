@@ -1,8 +1,5 @@
-extern crate png;
-extern crate rayon;
-
-use self::png::HasParameters;
-use self::rayon::prelude::*;
+use png::HasParameters;
+use rayon::prelude::*;
 
 use crate::camera::Camera;
 use crate::hit::Hit;
@@ -51,7 +48,7 @@ impl FromStr for Format {
 }
 
 impl fmt::Display for ParseFormatError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "failed to parse format which is neither png, nor ppm")
     }
 }
@@ -86,7 +83,7 @@ impl FromStr for Resolution {
 }
 
 impl fmt::Display for ParseResolutionError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "failed to parse resolution")
     }
 }
@@ -137,7 +134,8 @@ impl Image {
                             let u = (f64::from(i) + rand::random::<f64>()) / width;
                             let v = (f64::from(j) + rand::random::<f64>()) / height;
                             scene.sample(camera, Pixel::new(u, v))
-                        }).sum();
+                        })
+                        .sum();
 
                     let mut color = color / f64::from(sampling);
                     // Gamma correction
@@ -146,7 +144,8 @@ impl Image {
 
                     vec![color.x, color.y, color.z]
                 })
-            }).flatten()
+            })
+            .flatten()
             .collect();
 
         self.buffer.extend(body);

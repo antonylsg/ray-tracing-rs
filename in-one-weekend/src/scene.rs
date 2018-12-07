@@ -1,3 +1,5 @@
+use derive_new::new;
+
 use crate::camera::Camera;
 use crate::hit::Hit;
 use crate::image::Pixel;

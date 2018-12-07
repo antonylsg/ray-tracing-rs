@@ -1,3 +1,5 @@
+use derive_new::new;
+
 use crate::material::Material;
 use crate::material::Scattered;
 use crate::ray::Ray;
@@ -31,7 +33,7 @@ pub trait Hit {
         Box::new(self)
     }
 
-    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Impact>;
+    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Impact<'_>>;
 }
 
 #[derive(new)]
@@ -42,7 +44,7 @@ pub struct Impact<'m> {
     material: &'m dyn Material,
 }
 
-impl<'m> Impact<'m> {
+impl Impact<'_> {
     pub fn scatter(&self, ray: Ray) -> Option<Scattered> {
         self.material.scatter(ray, self)
     }
@@ -52,7 +54,7 @@ impl<T> Hit for Box<T>
 where
     T: Hit,
 {
-    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Impact> {
+    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<Impact<'_>> {
         (**self).hit(min, max, ray)
     }
 }
@@ -61,13 +63,14 @@ impl<T> Hit for Vec<T>
 where
     T: Hit,
 {
-    fn hit(&self, min: f64, mut max: f64, ray: &Ray) -> Option<Impact> {
+    fn hit(&self, min: f64, mut max: f64, ray: &Ray) -> Option<Impact<'_>> {
         self.iter()
             .flat_map(|hitable| {
                 hitable
                     .hit(min, max, ray)
                     .inspect(|impact| max = f64::min(max, impact.parameter))
-            }).min_by(|a, b| {
+            })
+            .min_by(|a, b| {
                 a.parameter
                     .partial_cmp(&b.parameter)
                     .unwrap_or(Ordering::Equal)

@@ -2,6 +2,7 @@
 name = "in-one-weekend"
 version = "0.1.0"
 authors = ["Antony Lesage <lesage.antony@gmail.com>"]
+edition = "2018"
 
 [dependencies]
 derive-new = "0.5"

@@ -1,3 +1,5 @@
+use derive_new::new;
+
 use crate::hit;
 use crate::material::Material;
 use crate::ray::Ray;
@@ -40,7 +42,7 @@ impl Intersect<Sphere> for [Sphere] {
 }
 
 impl hit::Hit for Sphere {
-    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<hit::Impact> {
+    fn hit(&self, min: f64, max: f64, ray: &Ray) -> Option<hit::Impact<'_>> {
         let centered = ray.origin - self.center;
         let a = ray.direction.norm_squared();
         // 2.0 cancels out

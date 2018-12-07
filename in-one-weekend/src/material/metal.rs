@@ -18,7 +18,7 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: Ray, impact: &hit::Impact) -> Option<Scattered> {
+    fn scatter(&self, ray: Ray, impact: &hit::Impact<'_>) -> Option<Scattered> {
         let reflected = reflect(&ray.direction, &impact.normal);
         let fuzzed = reflected + self.fuzz * shape::random_in_unit_sphere();
 

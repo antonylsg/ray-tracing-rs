@@ -1,3 +1,5 @@
+use derive_new::new;
+
 use crate::hit;
 use crate::material::Material;
 use crate::material::Scattered;
@@ -11,7 +13,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, ray: Ray, impact: &hit::Impact) -> Option<Scattered> {
+    fn scatter(&self, ray: Ray, impact: &hit::Impact<'_>) -> Option<Scattered> {
         let direction = impact.normal + shape::random_in_unit_sphere();
         let ray = ray.next(impact.point, direction);
 

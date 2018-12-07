@@ -1,6 +1,5 @@
-extern crate rand;
-
-use self::rand::Rng;
+use derive_new::new;
+use rand::Rng;
 
 use crate::hit;
 use crate::material;
@@ -16,7 +15,7 @@ pub struct Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, ray: Ray, impact: &hit::Impact) -> Option<Scattered> {
+    fn scatter(&self, ray: Ray, impact: &hit::Impact<'_>) -> Option<Scattered> {
         let normal;
         let ratio;
         let cosine;

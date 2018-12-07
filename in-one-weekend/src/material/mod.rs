@@ -1,4 +1,4 @@
-extern crate rand;
+use derive_new::new;
 
 use crate::hit;
 use crate::ray::Ray;
@@ -20,7 +20,7 @@ pub trait Material: Send + Sync {
         Box::new(self)
     }
 
-    fn scatter(&self, ray: Ray, impact: &hit::Impact) -> Option<Scattered>;
+    fn scatter(&self, ray: Ray, impact: &hit::Impact<'_>) -> Option<Scattered>;
 }
 
 #[derive(new)]

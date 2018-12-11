@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 derive-new = "0.5"
-itertools = "0.7"
+itertools = "0.8"
 nalgebra = "0.16"
 png = "0.13"
 rand = "0.6"

@@ -75,7 +75,7 @@ impl Scene<Sphere> {
 
         let materials = vec![
             Lambertian::new(Vec3::new(0.4, 0.2, 0.1)).boxed(),
-            Dielectric::new(1.5).boxed(),
+            Dielectric::new(Vec3::new(1.0, 1.0, 1.0), 1.5).boxed(),
             Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0).boxed(),
         ];
 
@@ -129,8 +129,8 @@ impl Scene<Sphere> {
                 Lambertian::new(Vec3::new(0.8, 0.8, 0.0)).boxed(),
                 Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.0).boxed(),
                 // Metal::new(Vec3::new(0.8, 0.8, 0.8), 1.0).boxed(),
-                Dielectric::new(1.5).boxed(),
-                Dielectric::new(1.5).boxed(),
+                Dielectric::new(Vec3::new(1.0, 1.0, 1.0), 1.5).boxed(),
+                Dielectric::new(Vec3::new(1.0, 1.0, 1.0), 1.5).boxed(),
                 Metal::new(Vec3::new(0.3, 0.3, 0.8), 0.5).boxed(),
                 // Metal::new(Vec3::new(224.0 / 255.0, 232.0 / 255.0, 222.0 / 255.0), 0.3).boxed(),
             ];

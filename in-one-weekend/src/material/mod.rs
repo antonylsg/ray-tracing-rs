@@ -45,6 +45,7 @@ pub fn random() -> Box<dyn Material> {
 
         Metal::new(Vec3::new(x, y, z), fuzz).boxed()
     } else {
-        Dielectric::new(1.5).boxed()
+        let attenuation = Vec3::new(1.0, 1.0, 1.0);
+        Dielectric::new(attenuation, 1.5).boxed()
     }
 }

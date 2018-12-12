@@ -10,6 +10,7 @@ use crate::Vec3;
 
 #[derive(new)]
 pub struct Dielectric {
+    attenuation: Vec3,
     /// Index of refraction.
     index: f64,
 }
@@ -35,8 +36,7 @@ impl Material for Dielectric {
             .filter(|_| !rand::thread_rng().gen_bool(schlick(cosine, self.index)))
             .unwrap_or_else(|| material::reflect(&ray.direction, &normal));
         let ray = ray.next(impact.point, direction);
-        let attenuation = Vec3::new(1.0, 1.0, 1.0);
-        Some(Scattered::new(ray, attenuation))
+        Some(Scattered::new(ray, self.attenuation))
     }
 }
 

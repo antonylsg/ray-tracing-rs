@@ -8,13 +8,13 @@ use crate::Vec3;
 use std::cmp::Ordering;
 
 trait InspectOption<T> {
-    fn inspect<F>(self, f: F) -> Option<T>
+    fn _inspect<F>(self, f: F) -> Option<T>
     where
         F: FnMut(&T);
 }
 
 impl<T> InspectOption<T> for Option<T> {
-    fn inspect<F>(self, mut f: F) -> Option<T>
+    fn _inspect<F>(self, mut f: F) -> Option<T>
     where
         F: FnMut(&T),
     {
@@ -68,7 +68,7 @@ where
             .flat_map(|hitable| {
                 hitable
                     .hit(min, max, ray)
-                    .inspect(|impact| max = f64::min(max, impact.parameter))
+                    ._inspect(|impact| max = f64::min(max, impact.parameter))
             })
             .min_by(|a, b| {
                 a.parameter

@@ -12,7 +12,7 @@ pub struct Metal {
 
 impl Metal {
     pub fn new(albedo: Vec3, fuzz: f64) -> Metal {
-        assert!(0.0 <= fuzz && fuzz <= 1.0);
+        assert!((0.0..1.0).contains(&fuzz));
         Metal { albedo, fuzz }
     }
 }

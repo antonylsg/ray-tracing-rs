@@ -1,5 +1,5 @@
+use clap::Parser;
 use nalgebra as na;
-use structopt::StructOpt;
 
 mod camera;
 mod hit;
@@ -17,9 +17,9 @@ use crate::scene::Scene;
 
 type Vec3 = na::Vector3<f64>;
 
-#[derive(StructOpt)]
-struct Opt {
-    #[structopt(
+#[derive(Parser)]
+struct Cli {
+    #[clap(
         short,
         long,
         help = "sets the image format to either png or ppm",
@@ -27,7 +27,7 @@ struct Opt {
     )]
     format: Format,
 
-    #[structopt(
+    #[clap(
         short,
         long,
         help = "sets the image resolution",
@@ -35,22 +35,22 @@ struct Opt {
     )]
     resolution: Resolution,
 
-    #[structopt(short, long, help = "sets the numbers of rays per image pixel")]
+    #[clap(short, long, help = "sets the numbers of rays per image pixel")]
     sampling: u32,
 
-    #[structopt(short, long, help = "sets the numbers of threads", default_value = "0")]
+    #[clap(short, long, help = "sets the numbers of threads", default_value = "0")]
     threads: usize,
 }
 
 fn main() {
-    let opt = Opt::from_args();
+    let cli = Cli::parse();
 
     rayon::ThreadPoolBuilder::new()
-        .num_threads(opt.threads)
+        .num_threads(cli.threads)
         .build_global()
         .unwrap();
 
-    let mut image = Image::new(opt.resolution, opt.sampling);
+    let mut image = Image::new(cli.resolution, cli.sampling);
 
     let origin = Vec3::new(13.0, 2.0, 3.0);
     let look_at = -Vec3::z();
@@ -70,5 +70,5 @@ fn main() {
     let scene = Scene::random();
 
     image.par_render(&scene, &camera);
-    image.save_as(opt.format).unwrap();
+    image.save_as(cli.format).unwrap();
 }

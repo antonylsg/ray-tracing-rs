@@ -1,4 +1,3 @@
-use png::HasParameters;
 use rayon::prelude::*;
 use strum_macros::Display;
 use strum_macros::EnumString;
@@ -92,7 +91,7 @@ impl Image {
 
                     let mut color = color / f64::from(sampling);
                     // Gamma correction
-                    color.apply(f64::sqrt);
+                    color.apply(|x| *x = x.sqrt());
                     let color: na::Vector3<u8> = na::try_convert(255.0 * color).unwrap();
 
                     vec![color.x, color.y, color.z]
@@ -106,7 +105,8 @@ impl Image {
 
     fn save_as_png(&self, writer: impl Write) -> Result<(), png::EncodingError> {
         let mut encoder = png::Encoder::new(writer, self.width, self.height);
-        encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
+        encoder.set_color(png::ColorType::Rgb);
+        encoder.set_depth(png::BitDepth::Eight);
 
         let mut writer = encoder.write_header()?;
         writer.write_image_data(&self.buffer)

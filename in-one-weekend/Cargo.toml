@@ -2,15 +2,15 @@
 name = "in-one-weekend"
 version = "0.1.0"
 authors = ["Antony Lesage <lesage.antony@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
+clap = { version = "3", features = ["derive"] }
 derive-new = "0.5"
-itertools = "0.8"
-nalgebra = "0.16"
-png = "0.13"
-rand = "0.6"
+itertools = "0.10"
+nalgebra = "0.31"
+png = "0.17"
+rand = "0.8"
 rayon = "1.0"
-structopt = "0.2"
-strum = "0.13"
-strum_macros = "0.13"
+strum = "0.24"
+strum_macros = "0.24"
